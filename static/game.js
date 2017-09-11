@@ -26,15 +26,19 @@ var movement = {
 
 function moveUp(){
 	movement.up = true;
+	movement.down = false;
 }
 function moveDown(){
 	movement.down = true;
+	movement.up = false;
 }
 function moveLeft(){
 	movement.left = true;
+	movement.right = false;
 }
 function moveRight(){
 	movement.right = true;
+	movement.left = false;
 }
 
 
@@ -53,17 +57,17 @@ function moveRight(){
 		// movement.up = true;
 	// }
 // });
-document.addEventListener('mouseup', function(event) {
-      movement.left = false;
-      movement.up = false;
-      movement.right = false;
-      movement.down = false;
-});
+// document.addEventListener('mouseup', function(event) {
+      // movement.left = false;
+      // movement.up = false;
+      // movement.right = false;
+      // movement.down = false;
+// });
 
 socket.emit('new player');
 setInterval(function() {
   socket.emit('movement', movement);
-}, 1000 / 60);
+}, 1000 / 30);
 
 var canvas = document.getElementById('canvas');
 canvas.width = 800;
@@ -76,7 +80,7 @@ socket.on('state', function(players) {
   for (var id in players) {
     var player = players[id];
     context.beginPath();
-    context.arc(player.x, player.y, 10, 0, 3 * Math.PI);
+    context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
     context.fill();
   }
 });
