@@ -11,7 +11,13 @@
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
-    <canvas id="canvas"></canvas>
+	<div id="canvasDiv">
+		<canvas id="canvas"></canvas>
+	</div>
+	<div id="roleButtons">
+		<button id="hostButton" onclick="clickHostRole()">Host</button>
+		<button id="playerButton" onclick="clickPlayerRole()">Player</button>
+	</div>
   </body>
   <script src="/static/game.js"></script>
 </html>

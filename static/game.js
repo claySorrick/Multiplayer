@@ -1,42 +1,56 @@
 var socket = io();
 
+function clickHostRole() {
+    document.getElementById("roleButtons").innerHTML = "";
+}
+
+function clickPlayerRole() {
+	document.getElementById("canvasDiv").innerHTML = "";
+    document.getElementById("roleButtons").innerHTML = "";
+}
+
 var movement = {
   up: false,
   down: false,
   left: false,
   right: false
 }
-document.addEventListener('keydown', function(event) {
-  switch (event.keyCode) {
-    case 65: // A
-      movement.left = true;
-      break;
-    case 87: // W
-      movement.up = true;
-      break;
-    case 68: // D
-      movement.right = true;
-      break;
-    case 83: // S
-      movement.down = true;
-      break;
-  }
+
+// function clickDown(position){
+	// if (event.clientx<document.body.clientWidth/3){
+		// movement.left = true;
+	// }
+	// else if (event.clientx> 2 * (document.body.clientWidth/3)){
+		// movement.right = true;
+	// }
+	// else if (event.clienty> document.body.clientWidth/2){
+		// movement.down = true;
+	// }
+	// else{
+		// movement.up = true;
+	// }
+// }
+
+document.addEventListener('mousedown', function(event) {
+	console.log(event);
+  if (event.clientX<document.body.clientWidth/3){
+		movement.left = true;
+	}
+	else if (event.clientX> 2 * (document.body.clientWidth/3)){
+		movement.right = true;
+	}
+	else if (event.clientY> document.body.clientHeight/2){
+		movement.down = true;
+	}
+	else{
+		movement.up = true;
+	}
 });
-document.addEventListener('keyup', function(event) {
-  switch (event.keyCode) {
-    case 65: // A
+document.addEventListener('mouseup', function(event) {
       movement.left = false;
-      break;
-    case 87: // W
       movement.up = false;
-      break;
-    case 68: // D
       movement.right = false;
-      break;
-    case 83: // S
       movement.down = false;
-      break;
-  }
 });
 
 socket.emit('new player');
@@ -49,13 +63,13 @@ canvas.width = 800;
 canvas.height = 600;
 var context = canvas.getContext('2d');
 socket.on('state', function(players) {
-  console.log(players);
+  // console.log(players);
   context.clearRect(0, 0, 800, 600);
   context.fillStyle = 'green';
   for (var id in players) {
     var player = players[id];
     context.beginPath();
-    context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
+    context.arc(player.x, player.y, 10, 0, 3 * Math.PI);
     context.fill();
   }
 });
