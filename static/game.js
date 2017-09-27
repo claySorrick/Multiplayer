@@ -1,86 +1,64 @@
 var socket = io();
+var WIDTH = document.body.clientWidth - (document.body.clientWidth*0.02);
+var HEIGHT = document.body.clientHeight - (document.body.clientHeight*0.02);
+var newDeck = deck.slice();
+var myTurn = false;
+
 
 function clickHostRole() {
-    document.getElementById("roleButtons").innerHTML = "";
+	console.log(newDeck);
+	socket.emit('newDeck', newDeck);
+    document.getElementById('roleButtons').innerHTML = '';
+	document.getElementById('cardButtons').innerHTML = '';
+	document.getElementById('canvasDiv').innerHTML = '<canvas id=\"canvas\"></canvas>';
+	var canvas = document.getElementById('canvas');
+	canvas.width = WIDTH;
+	canvas.height = HEIGHT;
+	canvas.style.letterSpacing = '-8px';
+	var context = canvas.getContext('2d');
+	context.font = '48px serif';
+	socket.on('state', function(currentDeck) {
+		console.log(currentDeck);
+		context.clearRect(0, 0, WIDTH, HEIGHT);
+		for(i=0; i<currentDeck.length; i++){
+			context.fillText(currentDeck[i].name,((i%13))*(WIDTH/14)+(Math.floor(i/13)*45),((i%13)+1)*(HEIGHT/14));
+		}
+	});
 }
 
 function clickPlayerRole() {
-	document.getElementById("canvasDiv").innerHTML = "<div style=\"text-align:center;\"><button onmousedown=\"moveUp()\">UP</button></div>" +
-	"<div style=\"text-align:center;\"><button onmousedown=\"moveLeft()\">LEFT</button>" +
-	"<button onmousedown=\"moveRight()\">RIGHT</button></div>" +
-	"<div style=\"text-align:center;\"><button onmousedown=\"moveDown()\">DOWN</button></div>";
-	
-	// <button ontouchstart="moveup()" onmousedown="moveup()" onmouseup="clearmove()">UP</button><br><br>
-  // <button ontouchstart="moveleft()" onmousedown="moveleft()" onmouseup="clearmove()">LEFT</button>
-  // <button ontouchstart="moveright()" onmousedown="moveright()" onmouseup="clearmove()">RIGHT</button><br><br>
-  // <button ontouchstart="movedown()" onmousedown="movedown()" onmouseup="clearmove()">DOWN</button></div>
-    document.getElementById("roleButtons").innerHTML = "";
+	document.getElementById('roleButtons').innerHTML = '';
+	document.getElementById('nameCreation').style.visibility = 'visible';
+	}
+function submitName(){
+	var name = document.getElementById('playerName').value;
+	console.log(name);
+	socket.emit('new player', name);
+	document.getElementById('nameCreation').innerHTML = '';
+	socket.on('turn', function(currentTurn) {
+		console.log(currentTurn.name);
+		console.log(socket.id);
+		if(currentTurn.playerID === socket.id){
+			console.log("MY TURN");
+			myTurn = true;
+			document.getElementById('cardButtons').style.visibility = 'visible';
+		}
+		else{
+			console.log("not MY TURN");
+			myTurn = false;
+			document.getElementById('cardButtons').style.visibility = 'hidden';
+		}
+	});
 }
 
-var movement = {
-  up: false,
-  down: false,
-  left: false,
-  right: false
+var move = {
+	guess:''
 }
 
-function moveUp(){
-	movement.up = true;
-	movement.down = false;
+function guess(value){
+	if(myTurn){
+		move.guess = value;
+		console.log(value);
+		socket.emit('move',move);
+	}
 }
-function moveDown(){
-	movement.down = true;
-	movement.up = false;
-}
-function moveLeft(){
-	movement.left = true;
-	movement.right = false;
-}
-function moveRight(){
-	movement.right = true;
-	movement.left = false;
-}
-
-
-// document.addEventListener('mousedown', function(event) {
-	// console.log(event);
-  // if (event.clientX<document.body.clientWidth/3){
-		// movement.left = true;
-	// }
-	// else if (event.clientX> 2 * (document.body.clientWidth/3)){
-		// movement.right = true;
-	// }
-	// else if (event.clientY> document.body.clientHeight/2){
-		// movement.down = true;
-	// }
-	// else{
-		// movement.up = true;
-	// }
-// });
-// document.addEventListener('mouseup', function(event) {
-      // movement.left = false;
-      // movement.up = false;
-      // movement.right = false;
-      // movement.down = false;
-// });
-
-socket.emit('new player');
-setInterval(function() {
-  socket.emit('movement', movement);
-}, 1000 / 30);
-
-var canvas = document.getElementById('canvas');
-canvas.width = 800;
-canvas.height = 600;
-var context = canvas.getContext('2d');
-socket.on('state', function(players) {
-  // console.log(players);
-  context.clearRect(0, 0, 800, 600);
-  context.fillStyle = 'green';
-  for (var id in players) {
-    var player = players[id];
-    context.beginPath();
-    context.arc(player.x, player.y, 10, 0, 2 * Math.PI);
-    context.fill();
-  }
-});
