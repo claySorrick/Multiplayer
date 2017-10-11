@@ -70,7 +70,7 @@ io.on('connection', function(socket) {
 	socket.on('newDeck', function(clientDeck) {
 		serverDeck = clientDeck;
 		console.log(serverDeck);
-		currentCard = Math.floor(Math.random() * 53);
+		currentCard = Math.floor(Math.random() * 51);
 		console.log(currentCard);
 	});
 	socket.on('disconnect', function(){
