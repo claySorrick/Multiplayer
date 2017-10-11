@@ -8,6 +8,12 @@ var app = express();
 var server = http.Server(app);
 var io = socketIO(server);
 
+io.attach(server, {
+  pingInterval: 10000,
+  pingTimeout: 5000,
+  cookie: false
+})
+
 var serverDeck = [];
 var currentTurn = 0;
 var currentCard = -1;
@@ -58,7 +64,7 @@ io.on('connection', function(socket) {
 		else{
 			currentTurn++;
 		}
-		console.log(players[currentTurn]);
+		console.log("player " + players[currentTurn].name + "'s turn");
 		io.sockets.emit('turn', players[currentTurn]);
 	});
 	socket.on('newDeck', function(clientDeck) {
@@ -75,7 +81,10 @@ io.on('connection', function(socket) {
 				break;
 			}
 		}
-		players.splice(socket.id,1);
+		if(players.length===0){
+			currentTurn = 0;
+			currentCard = -1;
+		}
 	});
 });
 
